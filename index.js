@@ -50,6 +50,7 @@ async function run() {
     const userCollection = client.db("seoWebsite").collection("users");
     const featurePageCollections = client.db("seoWebsite").collection("features");
     const metaCollections = client.db("seoWebsite").collection("metaInfo");
+    const CreateServicesCollections = client.db("seoWebsite").collection("CreateServices");
 
 
 
@@ -1492,6 +1493,148 @@ app.put("/meta-infomation/:id", async (req, res) => {
   res.send(result);
 });
 
+   /* CreateServicesCollections */
+
+   app.post("/add-service", async (req, res) => {
+    const addService = req.body;
+    const result = await CreateServicesCollections.insertOne(addService);
+    res.send(result);
+  });
+
+
+   app.get("/services-list", async (req, res) => {
+    const query = {};
+    const cursor = CreateServicesCollections.find(query);
+    const services = await cursor.toArray();
+    res.send(services);
+  });
+  
+  app.get("/service-list/:id", async (req, res) => {
+    const id = req.params.id; 
+    const query = { _id: new ObjectId(id) }; 
+    const service = await CreateServicesCollections.findOne(query); 
+    res.send(service);
+  });
+
+  app.get('/service/:slug', async (req, res) => {
+    const { slug } = req.params;
+    try {
+      const db = client.db('seoWebsite'); 
+      const collection = db.collection('CreateServices'); 
+      // Find the service by slug in MongoDB
+      const service = await collection.findOne({ postSlug: slug });
+      if (!service) {
+        return res.status(404).json({ error: 'Service not found' });
+      }
+      res.json(service);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+
+
+  app.put("/update-service-list/:id", async (req, res) => {
+    const id = req.params.id;
+    const updateService = req.body;
+    const filter = { _id: new ObjectId(id) };
+    const options = { upsert: true };
+    const updatedDoc = {
+      $set: {
+        title: updateService.title,
+        description: updateService.description,  
+        img: updateService.img, 
+        postSlug: updateService.postSlug,
+        packageNamePackageOne: updateService.packageNamePackageOne,
+        packageImagePackageOne: updateService.packageImagePackageOne,
+        pricePackageOne: updateService.pricePackageOne,
+        featureOnePackageOne: updateService.featureOnePackageOne,
+        featureTwoPackageOne: updateService.featureTwoPackageOne,
+        featureThreePackageOne: updateService.featureThreePackageOne,
+        featureFourPackageOne: updateService.featureFourPackageOne,
+        featureFivePackageOne: updateService.featureFivePackageOne,
+        featureSixPackageOne: updateService.featureSixPackageOne,
+        featureSevenPackageOne: updateService.featureSevenPackageOne,
+        featureEightPackageOne: updateService.featureEightPackageOne,
+        featureNinePackageOne: updateService.featureNinePackageOne,
+        featureTenPackageOne: updateService.featureTenPackageOne,
+        packageNamePackageTwo: updateService.packageNamePackageTwo,
+        packageImagePackageTwo: updateService.packageImagePackageTwo,
+        pricePackageTwo: updateService.pricePackageTwo,
+        featureOnePackageTwo: updateService.featureOnePackageTwo,
+        featureTwoPackageTwo: updateService.featureTwoPackageTwo,
+        featureThreePackageTwo: updateService.featureThreePackageTwo,
+        featureFourPackageTwo: updateService.featureFourPackageTwo,
+        featureFivePackageTwo: updateService.featureFivePackageTwo,
+        featureSixPackageTwo: updateService.featureSixPackageTwo,
+        featureSevenPackageTwo: updateService.featureSevenPackageTwo,
+        featureEightPackageTwo: updateService.featureEightPackageTwo,
+        featureNinePackageTwo: updateService.featureNinePackageTwo,
+        featureTenPackageTwo: updateService.featureTenPackageTwo,
+        packageNamePackageThree: updateService.packageNamePackageThree,
+        packageImagePackageThree: updateService.packageImagePackageThree,
+        pricePackageThree: updateService.pricePackageThree,
+        featureOnePackageThree: updateService.featureOnePackageThree,
+        featureTwoPackageThree: updateService.featureTwoPackageThree,
+        featureThreePackageThree: updateService.featureThreePackageThree,
+        featureFourPackageThree: updateService.featureFourPackageThree,
+        featureFivePackageThree: updateService.featureFivePackageThree,
+        featureSixPackageThree: updateService.featureSixPackageThree,
+        featureSevenPackageThree: updateService.featureSevenPackageThree,
+        featureEightPackageThree: updateService.featureEightPackageThree,
+        featureNinePackageThree: updateService.featureNinePackageThree,
+        featureTenPackageThree: updateService.featureTenPackageThree,
+        
+
+
+
+
+
+
+
+      },
+    };
+  
+    const result = await CreateServicesCollections.updateOne(
+      filter,
+      updatedDoc,
+      options
+    );
+    res.send(result);
+  });
+
+   app.get('/check-slug/:slug', async (req, res) => {
+    const slugToCheck = req.params.slug;
+    try {
+      const query = { postSlug: slugToCheck };
+      const matchingPosts = await CreateServicesCollections.find(query).toArray();
+      const existingSlugs = matchingPosts.map(post => post.postSlug);
+  
+      res.send(existingSlugs);
+    } catch (error) {
+      console.error('Error checking slug:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  app.delete("/service/:id", async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+  
+    try {
+      const result = await CreateServicesCollections.deleteOne(filter);
+      if (result.deletedCount === 1) {
+        res.status(200).json({ message: "service deleted successfully" });
+      } else {
+        res.status(404).json({ message: "service not found" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+  
+
 
 
   } finally {
@@ -1500,8 +1643,8 @@ app.put("/meta-infomation/:id", async (req, res) => {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("eCommerce Website is Live Now");
+  res.send("Server Website is Live Now");
 });
 app.listen(port, () => {
-  console.log(`eCommerce Website is Live Now ${port}`);
+  console.log(`Server is Live Now ${port}`);
 });
