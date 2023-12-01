@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const uri = process.env.MONGO_URI;
+// MONGO_URI=mongodb+srv://nft-server-com_limon:W2d9J4tXmZ6Vr8rD@nft-server-com.kv9kq4k.mongodb.net/?retryWrites=true&w=majority
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -24,6 +25,7 @@ async function run() {
     /* Seo site collection */
     const websiteCollections = client.db("seoWebsite").collection("websiteList");
     const packageCollections = client.db("seoWebsite").collection("packages");
+    const servicePackageCollections = client.db("seoWebsite").collection("servicePackage");
     const packageTitleCollections = client.db("seoWebsite").collection("packagesTitle");
     const orderCollections = client.db("seoWebsite").collection("orders");
     const paypalEmailCollections = client.db("seoWebsite").collection("email");
@@ -51,6 +53,7 @@ async function run() {
     const featurePageCollections = client.db("seoWebsite").collection("features");
     const metaCollections = client.db("seoWebsite").collection("metaInfo");
     const CreateServicesCollections = client.db("seoWebsite").collection("CreateServices");
+    const serviceTitleCollections= client.db("seoWebsite").collection("serviceTitle");
 
 
 
@@ -1545,53 +1548,6 @@ app.put("/meta-infomation/:id", async (req, res) => {
         description: updateService.description,  
         img: updateService.img, 
         postSlug: updateService.postSlug,
-        packageNamePackageOne: updateService.packageNamePackageOne,
-        packageImagePackageOne: updateService.packageImagePackageOne,
-        pricePackageOne: updateService.pricePackageOne,
-        featureOnePackageOne: updateService.featureOnePackageOne,
-        featureTwoPackageOne: updateService.featureTwoPackageOne,
-        featureThreePackageOne: updateService.featureThreePackageOne,
-        featureFourPackageOne: updateService.featureFourPackageOne,
-        featureFivePackageOne: updateService.featureFivePackageOne,
-        featureSixPackageOne: updateService.featureSixPackageOne,
-        featureSevenPackageOne: updateService.featureSevenPackageOne,
-        featureEightPackageOne: updateService.featureEightPackageOne,
-        featureNinePackageOne: updateService.featureNinePackageOne,
-        featureTenPackageOne: updateService.featureTenPackageOne,
-        packageNamePackageTwo: updateService.packageNamePackageTwo,
-        packageImagePackageTwo: updateService.packageImagePackageTwo,
-        pricePackageTwo: updateService.pricePackageTwo,
-        featureOnePackageTwo: updateService.featureOnePackageTwo,
-        featureTwoPackageTwo: updateService.featureTwoPackageTwo,
-        featureThreePackageTwo: updateService.featureThreePackageTwo,
-        featureFourPackageTwo: updateService.featureFourPackageTwo,
-        featureFivePackageTwo: updateService.featureFivePackageTwo,
-        featureSixPackageTwo: updateService.featureSixPackageTwo,
-        featureSevenPackageTwo: updateService.featureSevenPackageTwo,
-        featureEightPackageTwo: updateService.featureEightPackageTwo,
-        featureNinePackageTwo: updateService.featureNinePackageTwo,
-        featureTenPackageTwo: updateService.featureTenPackageTwo,
-        packageNamePackageThree: updateService.packageNamePackageThree,
-        packageImagePackageThree: updateService.packageImagePackageThree,
-        pricePackageThree: updateService.pricePackageThree,
-        featureOnePackageThree: updateService.featureOnePackageThree,
-        featureTwoPackageThree: updateService.featureTwoPackageThree,
-        featureThreePackageThree: updateService.featureThreePackageThree,
-        featureFourPackageThree: updateService.featureFourPackageThree,
-        featureFivePackageThree: updateService.featureFivePackageThree,
-        featureSixPackageThree: updateService.featureSixPackageThree,
-        featureSevenPackageThree: updateService.featureSevenPackageThree,
-        featureEightPackageThree: updateService.featureEightPackageThree,
-        featureNinePackageThree: updateService.featureNinePackageThree,
-        featureTenPackageThree: updateService.featureTenPackageThree,
-        
-
-
-
-
-
-
-
       },
     };
   
@@ -1634,7 +1590,99 @@ app.put("/meta-infomation/:id", async (req, res) => {
     }
   });
   
+/* servicePackageCollections */
+app.post("/add-service-package", async (req, res) => {
+  const servicePackage = req.body;
+  const result = await servicePackageCollections.insertOne(servicePackage);
+  res.send(result);
+});
 
+app.get("/service-packages", async (req, res) => {
+  const query = {};
+  const cursor = servicePackageCollections.find(query);
+  const servicePackages = await cursor.toArray();
+  res.send(servicePackages);
+});
+
+
+app.get("/service-package/:id", async (req, res) => {
+  const id = req.params.id; 
+  const query = { _id: new ObjectId(id) }; 
+  const servicePackage = await servicePackageCollections.findOne(query); 
+  res.send(servicePackage);
+});
+
+
+
+
+app.put("/service-package/:id", async (req, res) => {
+  const id = req.params.id;
+  const servicePackageUpdate = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const options = { upsert: true };
+  const updatedDoc = {
+    $set: {
+     
+    packageName: servicePackageUpdate.packageName,
+    price: servicePackageUpdate.price,
+    img: servicePackageUpdate.img,
+    featureOne: servicePackageUpdate.featureOne,
+    featureTwo: servicePackageUpdate.featureTwo,
+    featureThree: servicePackageUpdate.featureThree,
+    featureFour: servicePackageUpdate.featureFour,
+    featureFive: servicePackageUpdate.featureFive,
+    featureSix: servicePackageUpdate.featureSix,
+    featureSeven: servicePackageUpdate.featureSeven,
+    featureEight: servicePackageUpdate.featureEight,
+    featureNine: servicePackageUpdate.featureNine,
+    featureTen: servicePackageUpdate.featureTen,   
+    },
+  };
+
+  const result = await servicePackageCollections.updateOne(
+    filter,
+    updatedDoc,
+    options
+  );
+  res.send(result);
+});
+
+/* serviceTitleCollections */
+
+app.get("/service-title", async (req, res) => {
+  const query = {};
+  const cursor = serviceTitleCollections.find(query);
+  const serviceTitle = await cursor.toArray();
+  res.send(serviceTitle);
+});
+app.get("/service-title/:id", async (req, res) => {
+  const query = {};
+  const cursor = serviceTitleCollections.find(query);
+  const serviceTitle = await cursor.toArray();
+  res.send(serviceTitle);
+});
+
+app.put("/edit-service-title/:id", async (req, res) => {
+  const id = req.params.id;
+  const updateServiceTitle = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const options = { upsert: true };
+  const updatedDoc = {
+    $set: {
+      titleTopText: updateServiceTitle.titleTopText,
+      title: updateServiceTitle.title,
+      description: updateServiceTitle.description,
+     
+    },
+  };
+
+  const result = await serviceTitleCollections.updateOne(
+    filter,
+    updatedDoc,
+    options
+  );
+  res.send(result);
+});
 
 
   } finally {
